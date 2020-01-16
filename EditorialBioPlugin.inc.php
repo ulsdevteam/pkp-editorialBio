@@ -26,7 +26,7 @@ class EditorialBioPlugin extends GenericPlugin {
 			// Add a handler to process the biography page
 			HookRegistry::register('LoadHandler', array($this, 'callbackLoadHandler'));
 			// Add a convenience link to the biography page
-			HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
+			HookRegistry::register('TemplateManager::fetch', array($this, 'templateFetchCallback'));
 			}
 		return $success;
 	}
@@ -48,22 +48,45 @@ class EditorialBioPlugin extends GenericPlugin {
 	}
 
 	/**
-	 * Hook callback: register output filter to add privacy notice
-	 * @see TemplateManager::display()
+	 * Hook callback: add biography link example
+	 * @param $hookName string The name of the invoked hook
+	 * @param $params array Hook parameters
 	 */
-	function handleTemplateDisplay($hookName, $args) {
-		$templateMgr = $args[0];
-		$template = $args[1];
-		if ($template === 'frontend/pages/userRegister.tpl') {
-			if (method_exists($templateMgr, 'register_outputfilter')) {
-				// 3.1.1 and earlier (Smarty 2)
-				$templateMgr->register_outputfilter(array($this, 'userSettingsFilter'));
+	public function templateFetchCallback($hookName, $params) {
+		$request = $this->getRequest();
+		$router = $request->getRouter();
+		$dispatcher = $router->getDispatcher();
+
+		$resourceName = $params[1];
+		if ($resourceName === 'controllers/grid/gridRow.tpl') {
+			$templateMgr = $params[0];
+			// fetch the gridrow from the template
+			if (method_exists($templateMgr, 'getTemplateVars')) {
+				// Smarty 3
+				$row = $templateMgr->getTemplateVars('row');
 			} else {
-				// 3.1.2 and later (Smarty 3)
-				$templateMgr->registerFilter('output', array($this, 'userSettingsFilter'));
+				// Smarty 2
+				$row = $templateMgr->get_template_vars('row');
+			}
+			$data = $row ? $row->getData() : array();
+			// Is this a User grid?
+			if (is_a($data, 'User')) {
+				// userid from the grid
+				$userid = $data->getId();
+				// Is data present, and is the user able to administer this row?
+				if ($row->hasActions() && $this->isEditorWithBio($userid)) {
+					import('lib.pkp.classes.linkAction.request.OpenWindowAction');
+					$row->addAction(new LinkAction(
+						'plugins.generic.editorialBio.bioLink', //'editorialTeamBio',
+						new OpenWindowAction(
+							$dispatcher->url($request, ROUTE_PAGE, null, 'about', 'editorialTeamBio', $userid)
+						),
+						__('about.editorialTeam.biography'),
+						null
+					));
+				}
 			}
 		}
-		return false;
 	}
 
 	/**
@@ -120,4 +143,20 @@ class EditorialBioPlugin extends GenericPlugin {
 		return $templatePath . $templateDir . DIRECTORY_SEPARATOR;
 	}	
 
+	/**
+	 * Check if a user (by userid) is an editor with a biography
+	 * @param $userid int User Id
+	 * @return PKPUser
+	 */
+	public function isEditorWithBio($userid) {
+		$request = $this->getRequest();
+		$userdao = DAORegistry::getDAO('UserDAO');
+		$editor = $userdao->getById($userid);
+		$context = $request->getContext();
+		$contextId = $context ? $context->getId() : CONTEXT_SITE;
+		if ($editor->hasRole([ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR], $contextId) && $editor->getLocalizedData('biography')) {
+			return $editor;
+		}
+		return false;
+	}
 }

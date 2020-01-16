@@ -21,13 +21,10 @@ class EditorialBioHandler extends Handler {
 	 */
 	function editorialTeamBio($args, $request) {
 		$userId = (int)$args[0];
-		$userdao = DAORegistry::getDAO('UserDAO');
-		$editor = $userdao->getById($userId);
-		$context = $request->getContext();
-		$contextId = $context ? $context->getId() : CONTEXT_SITE;
-		if ($editor->hasRole([ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR], $contextId) && $editor->getLocalizedData('biography')) {
+		$plugin = PluginRegistry::getPlugin('generic', 'editorialbioplugin');
+		$editor = $plugin->isEditorWithBio($userId);
+		if ($editor) {
 			// This user is an editor and has a biography
-			$plugin = PluginRegistry::getPlugin('generic', 'editorialbioplugin');
 			$templateMgr = TemplateManager::getManager($request);
 			$templateMgr->assign('editor', $editor);
 			$templateMgr->display($plugin->getTemplateResource('frontend/pages/aboutEditorialTeamBio.tpl'));
