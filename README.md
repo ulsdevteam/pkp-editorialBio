@@ -1,6 +1,6 @@
 # EditorialBio plugin for PKP
 
-This plugin exposes the editorial bio user data as a page, as used to be the case with OJS 2.x.
+This plugin exposes the editorial biographies as pages, as used to be the case with OJS 2.x.
 
 ## Requirements
 
@@ -9,7 +9,7 @@ This plugin exposes the editorial bio user data as a page, as used to be the cas
 
 ## Installation
 
-Install this as a "generic" plugin. The preferred installation method is through the Plugin Gallery.  To install manually via the filesystem, extract the contents of this archive to an "editorialBio" directory under "plugins/generic" in your OJS root.  To install via Git submodule, target that same directory path: `git submodule add https://github.com/ulsdevteam/pkp-editorialBio plugins/generic/editorialBio` and `git submodule update --init --recursive plugins/generic/editorialBio`.  Run the upgrade script to register this plugin, e.g.: `php tools/upgrade.php upgrade`
+Install this as a "generic" plugin. The preferred installation method is through the Plugin Gallery.  To install manually via the filesystem, extract the contents of this archive to an "editorialBio" directory under "plugins/generic" in your OJS root.  To install via Git submodule, target that same directory path: `git submodule add https://github.com/ulsdevteam/pkp-editorialBio plugins/generic/editorialBio` and `git submodule update --init --recursive plugins/generic/editorialBio`.  Run the plugin install script to register this plugin, e.g.: `php lib/pkp/tools/installPluginVersion.php plugins/generic/editorialBio/version.xml`, or run the upgrade script, e.g.: `php tools/upgrade.php upgrade`
 
 ## Configuration
 
@@ -17,7 +17,8 @@ No configuration is needed.  Just enable and go!
 
 ## Usage
 
-The endpoint [journal_path]/about/editorialTeamBio/[user_id] will respond to display a public editorial bio page, if data is entered in the editorialBio for that user.  To find the path, edit the user's profile to find a reference to the link.
+The endpoint *journal_path*/about/editorialTeamBio/*user_id* will respond to display a public editorial bio page, if data is entered in the biography for an editor or journal manager.  To find the path, browse to the user's profile in the Users List to find a reference to the link. E.g.:
+![Users list with expanded user, showing the Biography link](bio-link-example.png)
 
 ## Author / License
 

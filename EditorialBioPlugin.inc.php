@@ -73,11 +73,11 @@ class EditorialBioPlugin extends GenericPlugin {
 			if (is_a($data, 'User')) {
 				// userid from the grid
 				$userid = $data->getId();
-				// Is data present, and is the user able to administer this row?
+				// Is data present, and is the user eligible?
 				if ($row->hasActions() && $this->isEditorWithBio($userid)) {
 					import('lib.pkp.classes.linkAction.request.OpenWindowAction');
 					$row->addAction(new LinkAction(
-						'plugins.generic.editorialBio.bioLink', //'editorialTeamBio',
+						'plugins.generic.editorialBio.bioLink',
 						new OpenWindowAction(
 							$dispatcher->url($request, ROUTE_PAGE, null, 'about', 'editorialTeamBio', $userid)
 						),
