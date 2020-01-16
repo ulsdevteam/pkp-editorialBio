@@ -121,7 +121,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	/**
 	 * Check if a user (by userid) is an editor with a biography
 	 * @param $userid int User Id
-	 * @return PKPUser
+	 * @return PKPUser|false
 	 */
 	public function isEditorWithBio($userid) {
 		$request = $this->getRequest();
@@ -130,6 +130,7 @@ class EditorialBioPlugin extends GenericPlugin {
 		if ($editor) {
 			$context = $request->getContext();
 			$contextId = $context ? $context->getId() : CONTEXT_SITE;
+			// Must be an Editor and must have a Biography to be valid
 			if ($editor->hasRole([ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR], $contextId) && $editor->getLocalizedData('biography')) {
 				return $editor;
 			}
