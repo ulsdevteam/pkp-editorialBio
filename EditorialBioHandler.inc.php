@@ -20,7 +20,11 @@ class EditorialBioHandler extends Handler {
 	 * @param $request PKPRequest Request object.
 	 */
 	function editorialTeamBio($args, $request) {
-		$userId = (int)$args[0];
+		if (preg_match('/^[[:digit:]]+$/', $args[0])) {
+			$userId = (int)$args[0];
+		} else {
+			$userId = 0;
+		}
 		$plugin = PluginRegistry::getPlugin('generic', 'editorialbioplugin');
 		$editor = $plugin->isEditorWithBio($userId);
 		if ($editor) {
@@ -30,7 +34,8 @@ class EditorialBioHandler extends Handler {
 			$templateMgr->display($plugin->getTemplateResource('frontend/pages/aboutEditorialTeamBio.tpl'));
 		} else {
 			// Don't trust other users biographies
-			
+			$dispatcher = $request->getDispatcher();
+			$dispatcher->handle404();
 		}
 	}
 }

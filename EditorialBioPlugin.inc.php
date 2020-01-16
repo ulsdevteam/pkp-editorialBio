@@ -90,31 +90,6 @@ class EditorialBioPlugin extends GenericPlugin {
 	}
 
 	/**
-	 * Output filter adds privacy notice to registration form.
-	 * @param $output string
-	 * @param $templateMgr TemplateManager
-	 * @return $string
-	 */
-	function userSettingsFilter($output, $templateMgr) {
-		if (preg_match('/<form[^>]+id="register"[^>]+>/', $output, $matches, PREG_OFFSET_CAPTURE)) {
-			$match = $matches[0][0];
-			$offset = $matches[0][1];
-			$newOutput = substr($output, 0, $offset+strlen($match));
-			$newOutput .= '<div id="editorialBioLink">'.__('plugins.generic.editorialBio.privacyNotice').'</div>';
-			$newOutput .= substr($output, $offset+strlen($match));
-			$output = $newOutput;
-			if (method_exists($templateMgr, 'unregister_outputfilter')) {
-				// 3.1.1 and earlier (Smarty 2)
-				$templateMgr->unregister_outputfilter('userSettingsFilter');
-			} else {
-				// 3.1.2 and later (Smarty 3)
-				$templateMgr->unregisterFilter('output', array($this, 'userSettingsFilter'));
-			}
-		}
-		return $output;
-	}
-
-	/**
 	 * @see PKPComponentRouter::route()
 	 */
 	public function callbackLoadHandler($hookName, $args) {
@@ -152,10 +127,12 @@ class EditorialBioPlugin extends GenericPlugin {
 		$request = $this->getRequest();
 		$userdao = DAORegistry::getDAO('UserDAO');
 		$editor = $userdao->getById($userid);
-		$context = $request->getContext();
-		$contextId = $context ? $context->getId() : CONTEXT_SITE;
-		if ($editor->hasRole([ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR], $contextId) && $editor->getLocalizedData('biography')) {
-			return $editor;
+		if ($editor) {
+			$context = $request->getContext();
+			$contextId = $context ? $context->getId() : CONTEXT_SITE;
+			if ($editor->hasRole([ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR], $contextId) && $editor->getLocalizedData('biography')) {
+				return $editor;
+			}
 		}
 		return false;
 	}
