@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * plugins/generic/editorialBio/locale/en_US/locale.xml
+  *
+  * Copyright (c) University of Pittsburgh
+  * Distributed under the GNU GPL v2 or later. For full terms see the LICENSE file.
+  *
+  * EditorialBio plugin localization strings
+  -->
+ 
+<locale name="es_ES" full_name="Español (España)">
+
+	<!-- EditorialBio -->
+	<message key="plugins.generic.editorialBio.displayName">Módulo EditorialBio</message>
+	<message key="plugins.generic.editorialBio.description"><![CDATA[Habilita una página pública de biografía editorial de los integrantes del mismo, con datos de sus perfiles.]]></message>
+	<message key="grid.action.plugins.generic.editorialBio.bioLink">Enlace público a la biografía del equipo editorial</message>
+</locale>
