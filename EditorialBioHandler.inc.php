@@ -31,7 +31,17 @@ class EditorialBioHandler extends Handler {
 			// This user is an editor and has a biography
 			$templateMgr = TemplateManager::getManager($request);
 			$templateMgr->assign('editor', $editor);
-			$templateMgr->display($plugin->getTemplateResource('frontend/pages/aboutEditorialTeamBio.tpl'));
+			// fetch the template across versions
+			$tplName = 'frontend/pages/aboutEditorialTeamBio.tpl';
+			if (method_exists($plugin, 'getTemplateResource')) {
+				// 3.1.2 and after
+				$tpl = $plugin->getTemplateResource($tplName);
+			} else {
+				// 3.1.1 and before
+				$tpl = $plugin->getTemplatePath() . $tplName;
+			}
+
+			$templateMgr->display($tpl);
 		} else {
 			// Don't trust other users biographies
 			$dispatcher = $request->getDispatcher();
