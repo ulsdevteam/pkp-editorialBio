@@ -9,7 +9,9 @@ This plugin exposes the editorial biographies as pages, as used to be the case w
 
 ## Installation
 
-Install this as a "generic" plugin. The preferred installation method is through the Plugin Gallery.  To install manually via the filesystem, extract the contents of this archive to an "editorialBio" directory under "plugins/generic" in your OJS root.  To install via Git submodule, target that same directory path: `git submodule add https://github.com/ulsdevteam/pkp-editorialBio plugins/generic/editorialBio` and `git submodule update --init --recursive plugins/generic/editorialBio`.  Run the plugin install script to register this plugin, e.g.: `php lib/pkp/tools/installPluginVersion.php plugins/generic/editorialBio/version.xml`, or run the upgrade script, e.g.: `php tools/upgrade.php upgrade`
+Install this as a "generic" plugin. The preferred installation method is through the Plugin Gallery.
+
+To install manually via the filesystem, extract the contents of this archive to an "editorialBio" directory under "plugins/generic" in your OJS root.  To install via Git submodule, target that same directory path: `git submodule add https://github.com/ulsdevteam/pkp-editorialBio plugins/generic/editorialBio`.  Run the plugin install script to register this plugin, e.g.: `php lib/pkp/tools/installPluginVersion.php plugins/generic/editorialBio/version.xml`, or run the upgrade script, e.g.: `php tools/upgrade.php upgrade`
 
 ## Configuration
 
