@@ -12,8 +12,8 @@
 <version>
 	<application>editorialBio</application>
 	<type>plugins.generic</type>
-	<release>1.0.0.1</release>
-	<date>2021-07-26</date>
+	<release>1.0.0.2</release>
+	<date>2021-04-29</date>
 	<lazy-load>1</lazy-load>
 	<class>EditorialBioPlugin</class>
 </version>
