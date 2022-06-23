@@ -31,6 +31,8 @@ class EditorialBioHandler extends Handler {
 			// This user is an editor and has a biography
 			$templateMgr = TemplateManager::getManager($request);
 			$templateMgr->assign('editor', $editor);
+			$publicfiles = Config::getVar('files', 'public_files_dir') . '/site';
+			$templateMgr->assign('publicfiles', $publicfiles);
 			// fetch the template across versions
 			$tplName = 'frontend/pages/aboutEditorialTeamBio.tpl';
 			if (method_exists($plugin, 'getTemplateResource')) {

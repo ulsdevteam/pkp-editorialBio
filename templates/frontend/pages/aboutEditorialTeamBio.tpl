@@ -22,7 +22,9 @@
 	</h2>
 
 	<div class="editorialTeamBioContent">
+		<img src="{$baseUrl}/{$publicfiles}/{$editor->_data['profileImage']['uploadName']}?{""|uniqid}" alt="{translate key="user.profile.form.profileImage"}" />
 		{$editor->getLocalizedData('biography')|strip_unsafe_html}
+		{$editor->orcid|strip_unsafe_html}
 	</div>
 
 </div><!-- .page -->
