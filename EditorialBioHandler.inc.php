@@ -10,7 +10,8 @@
  * @brief Handles controller requests for EditorialBio plugin.
  */
 
-import('classes.handler.Handler');
+//import('classes.handler.Handler');  //imports need replaced with use statements
+use APP\handler\Handler;
 
 class EditorialBioHandler extends Handler {
 
@@ -19,7 +20,7 @@ class EditorialBioHandler extends Handler {
 	 * @param $args array Arguments array.
 	 * @param $request PKPRequest Request object.
 	 */
-	function editorialTeamBio($args, $request) {
+	public function editorialTeamBio($args, $request) {
 		if (preg_match('/^[[:digit:]]+$/', $args[0])) {
 			$userId = (int)$args[0];
 		} else {
@@ -33,13 +34,14 @@ class EditorialBioHandler extends Handler {
 			$templateMgr->assign('editor', $editor);
 			// fetch the template across versions
 			$tplName = 'frontend/pages/aboutEditorialTeamBio.tpl';
-			if (method_exists($plugin, 'getTemplateResource')) {
+			$tpl = $plugin->getTemplateResource($tplName);
+			/*if (method_exists($plugin, 'getTemplateResource')) {
 				// 3.1.2 and after
 				$tpl = $plugin->getTemplateResource($tplName);
 			} else {
 				// 3.1.1 and before
 				$tpl = $plugin->getTemplatePath() . $tplName;
-			}
+			}*/
 
 			$templateMgr->display($tpl);
 		} else {

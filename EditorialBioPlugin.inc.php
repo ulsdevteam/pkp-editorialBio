@@ -12,21 +12,27 @@
  * @brief EditorialBio plugin class
  */
 
-import('lib.pkp.classes.plugins.GenericPlugin');
+//import('lib.pkp.classes.plugins.GenericPlugin');  //replace with use statement
+namespace GenericPlugin;
+use APP\facades\Repo;
+use PKP\plugins\GenericPlugin;
+use PKP\plugins\Hook;
 
 class EditorialBioPlugin extends GenericPlugin {
 	
 	/**
 	 * @copydoc LazyLoadPlugin::register()
 	 */
-	function register($category, $path, $mainContextId = NULL) {
+	public function register($category, $path, $mainContextId = NULL) {
 		$success = parent::register($category, $path, $mainContextId);
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled()) {
 			// Add a handler to process the biography page
-			HookRegistry::register('LoadHandler', array($this, 'callbackLoadHandler'));
+			Hook::add('LoadHandler', array($this, 'callbackLoadHandler'));
+			//HookRegistry::register('LoadHandler', array($this, 'callbackLoadHandler')); //add hook registry use and rename these lines
 			// Add a convenience link to the biography page
-			HookRegistry::register('TemplateManager::fetch', array($this, 'templateFetchCallback'));
+			Hook::add('TemplateManager::fetch', array($this, 'templateFetchCallback'));
+			//HookRegistry::register('TemplateManager::fetch', array($this, 'templateFetchCallback'));
 			}
 		return $success;
 	}
@@ -35,7 +41,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	 * Get the display name of this plugin.
 	 * @return String
 	 */
-	function getDisplayName() {
+	public function getDisplayName() {
 		return __('plugins.generic.editorialBio.displayName');
 	}
 
@@ -43,7 +49,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	 * Get a description of the plugin.
 	 * @return String
 	 */
-	function getDescription() {
+	public function getDescription() {
 		return __('plugins.generic.editorialBio.description');
 	}
 
@@ -94,7 +100,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	 */
 	public function callbackLoadHandler($hookName, $args) {
 		if ($args[0] === "about" && $args[1] === "editorialTeamBio") {
-                        define('HANDLER_CLASS', 'EditorialBioHandler');
+						define('HANDLER_CLASS', 'EditorialBioHandler');
 			$args[0] = "plugins.generic.editorialBio.".HANDLER_CLASS;
 			import($args[0]);
 			return true;
@@ -105,8 +111,9 @@ class EditorialBioPlugin extends GenericPlugin {
 	/**
 	 * @see PKPPlugin::getTemplatePath()
 	 */
-	function getTemplatePath($inCore = false) {
+	public function getTemplatePath($inCore = false) {
 		$templatePath = parent::getTemplatePath($inCore);
+		//return $templatePath;
 		// OJS 3.1.2 and later include the 'templates' directory, but no trailing slash
 		$templateDir = 'templates';
 		if (strlen($templatePath) >= strlen($templateDir)) {
@@ -115,7 +122,7 @@ class EditorialBioPlugin extends GenericPlugin {
 			}
 		}
 		// OJS 3.1.1 and earlier includes a trailing slash to the plugin path
-		return $templatePath . $templateDir . DIRECTORY_SEPARATOR;
+		//return $templatePath . $templateDir . DIRECTORY_SEPARATOR;
 	}	
 
 	/**
@@ -125,6 +132,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	 */
 	public function isEditorWithBio($userid) {
 		$request = $this->getRequest();
+		//$editor = Repo::userdao()->get($userid);
 		$userdao = DAORegistry::getDAO('UserDAO');
 		$editor = $userdao->getById($userid);
 		if ($editor) {
