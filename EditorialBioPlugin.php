@@ -11,15 +11,18 @@
  *
  * @brief EditorialBio plugin class
  */
+namespace APP\plugins\generic\editorialBio;
 
-//import('lib.pkp.classes.plugins.GenericPlugin');  //replace with use statement
-namespace GenericPlugin;
 use APP\facades\Repo;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
+use PKP\config\Config;
+use PKP\linkAction\LinkAction;
+use PKP\linkAction\request\OpenWindowAction;
+
+//new EditorialBioPlugin();
 
 class EditorialBioPlugin extends GenericPlugin {
-	
 	/**
 	 * @copydoc LazyLoadPlugin::register()
 	 */
@@ -29,10 +32,8 @@ class EditorialBioPlugin extends GenericPlugin {
 		if ($success && $this->getEnabled()) {
 			// Add a handler to process the biography page
 			Hook::add('LoadHandler', array($this, 'callbackLoadHandler'));
-			//HookRegistry::register('LoadHandler', array($this, 'callbackLoadHandler')); //add hook registry use and rename these lines
 			// Add a convenience link to the biography page
 			Hook::add('TemplateManager::fetch', array($this, 'templateFetchCallback'));
-			//HookRegistry::register('TemplateManager::fetch', array($this, 'templateFetchCallback'));
 			}
 		return $success;
 	}
@@ -81,7 +82,7 @@ class EditorialBioPlugin extends GenericPlugin {
 				$userid = $data->getId();
 				// Is data present, and is the user eligible?
 				if ($row->hasActions() && $this->isEditorWithBio($userid)) {
-					import('lib.pkp.classes.linkAction.request.OpenWindowAction');
+					//import('lib.pkp.classes.linkAction.request.OpenWindowAction');
 					$row->addAction(new LinkAction(
 						'plugins.generic.editorialBio.bioLink',
 						new OpenWindowAction(
@@ -113,16 +114,12 @@ class EditorialBioPlugin extends GenericPlugin {
 	 */
 	public function getTemplatePath($inCore = false) {
 		$templatePath = parent::getTemplatePath($inCore);
-		//return $templatePath;
-		// OJS 3.1.2 and later include the 'templates' directory, but no trailing slash
 		$templateDir = 'templates';
 		if (strlen($templatePath) >= strlen($templateDir)) {
 			if (substr_compare($templatePath, $templateDir, strlen($templatePath) - strlen($templateDir), strlen($templateDir)) === 0) {
 				return $templatePath;
 			}
 		}
-		// OJS 3.1.1 and earlier includes a trailing slash to the plugin path
-		//return $templatePath . $templateDir . DIRECTORY_SEPARATOR;
 	}	
 
 	/**
@@ -132,9 +129,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	 */
 	public function isEditorWithBio($userid) {
 		$request = $this->getRequest();
-		//$editor = Repo::userdao()->get($userid);
-		$userdao = DAORegistry::getDAO('UserDAO');
-		$editor = $userdao->getById($userid);
+		$editor = Repo::user()->get($userid);
 		if ($editor) {
 			$context = $request->getContext();
 			$contextId = $context ? $context->getId() : CONTEXT_SITE;
@@ -145,4 +140,8 @@ class EditorialBioPlugin extends GenericPlugin {
 		}
 		return false;
 	}
+}
+
+if (!PKP_STRICT_MODE) {
+    class_alias('APP\plugins\generic\editorialBio\EditorialBioPlugin', '\EditorialBioPlugin');
 }
