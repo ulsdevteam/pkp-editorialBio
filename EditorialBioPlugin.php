@@ -19,8 +19,8 @@ use PKP\plugins\Hook;
 use PKP\config\Config;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\OpenWindowAction;
-
-//new EditorialBioPlugin();
+use PKP\security\Role;
+use PKP\core\PKPApplication;
 
 class EditorialBioPlugin extends GenericPlugin {
 	/**
@@ -77,16 +77,16 @@ class EditorialBioPlugin extends GenericPlugin {
 			}
 			$data = $row ? $row->getData() : array();
 			// Is this a User grid?
-			if (is_a($data, 'User')) {
+			if (is_a($data, 'User') || is_a($data, 'PKP\user\User')) {
 				// userid from the grid
 				$userid = $data->getId();
 				// Is data present, and is the user eligible?
 				if ($row->hasActions() && $this->isEditorWithBio($userid)) {
-					//import('lib.pkp.classes.linkAction.request.OpenWindowAction');
+					$routePage = PKPApplication::ROUTE_PAGE;
 					$row->addAction(new LinkAction(
 						'plugins.generic.editorialBio.bioLink',
 						new OpenWindowAction(
-							$dispatcher->url($request, ROUTE_PAGE, null, 'about', 'editorialTeamBio', $userid)
+							$dispatcher->url($request, $routePage, null, 'about', 'editorialTeamBio', $userid)
 						),
 						__('about.editorialTeam.biography'),
 						null
@@ -101,7 +101,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	 */
 	public function callbackLoadHandler($hookName, $args) {
 		if ($args[0] === "about" && $args[1] === "editorialTeamBio") {
-						define('HANDLER_CLASS', 'EditorialBioHandler');
+			define('HANDLER_CLASS', 'EditorialBioHandler');
 			$args[0] = "plugins.generic.editorialBio.".HANDLER_CLASS;
 			import($args[0]);
 			return true;
@@ -130,11 +130,12 @@ class EditorialBioPlugin extends GenericPlugin {
 	public function isEditorWithBio($userid) {
 		$request = $this->getRequest();
 		$editor = Repo::user()->get($userid);
+		$editorRoles = [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR];
 		if ($editor) {
 			$context = $request->getContext();
 			$contextId = $context ? $context->getId() : CONTEXT_SITE;
 			// Must be an Editor and must have a Biography to be valid
-			if ($editor->hasRole([ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR], $contextId) && $editor->getLocalizedData('biography')) {
+			if ($editor->hasRole($editorRoles, $contextId) && $editor->getLocalizedData('biography')) {
 				return $editor;
 			}
 		}

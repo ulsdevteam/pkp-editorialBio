@@ -10,6 +10,8 @@
  * @brief Handles controller requests for EditorialBio plugin.
  */
 use APP\handler\Handler;
+use APP\template\TemplateManager;
+use PKP\plugins\PluginRegistry;
 
 class EditorialBioHandler extends Handler {
 
