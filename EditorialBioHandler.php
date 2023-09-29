@@ -9,8 +9,9 @@
  * @ingroup plugins_generic_editorialBio
  * @brief Handles controller requests for EditorialBio plugin.
  */
-
-import('classes.handler.Handler');
+use APP\handler\Handler;
+use APP\template\TemplateManager;
+use PKP\plugins\PluginRegistry;
 
 class EditorialBioHandler extends Handler {
 
@@ -19,7 +20,7 @@ class EditorialBioHandler extends Handler {
 	 * @param $args array Arguments array.
 	 * @param $request PKPRequest Request object.
 	 */
-	function editorialTeamBio($args, $request) {
+	public function editorialTeamBio($args, $request) {
 		if (preg_match('/^[[:digit:]]+$/', $args[0])) {
 			$userId = (int)$args[0];
 		} else {
@@ -33,14 +34,7 @@ class EditorialBioHandler extends Handler {
 			$templateMgr->assign('editor', $editor);
 			// fetch the template across versions
 			$tplName = 'frontend/pages/aboutEditorialTeamBio.tpl';
-			if (method_exists($plugin, 'getTemplateResource')) {
-				// 3.1.2 and after
-				$tpl = $plugin->getTemplateResource($tplName);
-			} else {
-				// 3.1.1 and before
-				$tpl = $plugin->getTemplatePath() . $tplName;
-			}
-
+			$tpl = $plugin->getTemplateResource($tplName);
 			$templateMgr->display($tpl);
 		} else {
 			// Don't trust other users biographies

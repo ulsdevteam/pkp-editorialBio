@@ -11,22 +11,29 @@
  *
  * @brief EditorialBio plugin class
  */
+namespace APP\plugins\generic\editorialBio;
 
-import('lib.pkp.classes.plugins.GenericPlugin');
+use APP\facades\Repo;
+use PKP\plugins\GenericPlugin;
+use PKP\plugins\Hook;
+use PKP\config\Config;
+use PKP\linkAction\LinkAction;
+use PKP\linkAction\request\OpenWindowAction;
+use PKP\security\Role;
+use PKP\core\PKPApplication;
 
 class EditorialBioPlugin extends GenericPlugin {
-	
 	/**
 	 * @copydoc LazyLoadPlugin::register()
 	 */
-	function register($category, $path, $mainContextId = NULL) {
+	public function register($category, $path, $mainContextId = NULL) {
 		$success = parent::register($category, $path, $mainContextId);
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled()) {
 			// Add a handler to process the biography page
-			HookRegistry::register('LoadHandler', array($this, 'callbackLoadHandler'));
+			Hook::add('LoadHandler', array($this, 'callbackLoadHandler'));
 			// Add a convenience link to the biography page
-			HookRegistry::register('TemplateManager::fetch', array($this, 'templateFetchCallback'));
+			Hook::add('TemplateManager::fetch', array($this, 'templateFetchCallback'));
 			}
 		return $success;
 	}
@@ -35,7 +42,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	 * Get the display name of this plugin.
 	 * @return String
 	 */
-	function getDisplayName() {
+	public function getDisplayName() {
 		return __('plugins.generic.editorialBio.displayName');
 	}
 
@@ -43,7 +50,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	 * Get a description of the plugin.
 	 * @return String
 	 */
-	function getDescription() {
+	public function getDescription() {
 		return __('plugins.generic.editorialBio.description');
 	}
 
@@ -70,16 +77,16 @@ class EditorialBioPlugin extends GenericPlugin {
 			}
 			$data = $row ? $row->getData() : array();
 			// Is this a User grid?
-			if (is_a($data, 'User')) {
+			if (is_a($data, 'User') || is_a($data, 'PKP\user\User')) {
 				// userid from the grid
 				$userid = $data->getId();
 				// Is data present, and is the user eligible?
 				if ($row->hasActions() && $this->isEditorWithBio($userid)) {
-					import('lib.pkp.classes.linkAction.request.OpenWindowAction');
+					$routePage = PKPApplication::ROUTE_PAGE;
 					$row->addAction(new LinkAction(
 						'plugins.generic.editorialBio.bioLink',
 						new OpenWindowAction(
-							$dispatcher->url($request, ROUTE_PAGE, null, 'about', 'editorialTeamBio', $userid)
+							$dispatcher->url($request, $routePage, null, 'about', 'editorialTeamBio', $userid)
 						),
 						__('about.editorialTeam.biography'),
 						null
@@ -94,7 +101,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	 */
 	public function callbackLoadHandler($hookName, $args) {
 		if ($args[0] === "about" && $args[1] === "editorialTeamBio") {
-                        define('HANDLER_CLASS', 'EditorialBioHandler');
+			define('HANDLER_CLASS', 'EditorialBioHandler');
 			$args[0] = "plugins.generic.editorialBio.".HANDLER_CLASS;
 			import($args[0]);
 			return true;
@@ -105,17 +112,14 @@ class EditorialBioPlugin extends GenericPlugin {
 	/**
 	 * @see PKPPlugin::getTemplatePath()
 	 */
-	function getTemplatePath($inCore = false) {
+	public function getTemplatePath($inCore = false) {
 		$templatePath = parent::getTemplatePath($inCore);
-		// OJS 3.1.2 and later include the 'templates' directory, but no trailing slash
 		$templateDir = 'templates';
 		if (strlen($templatePath) >= strlen($templateDir)) {
 			if (substr_compare($templatePath, $templateDir, strlen($templatePath) - strlen($templateDir), strlen($templateDir)) === 0) {
 				return $templatePath;
 			}
 		}
-		// OJS 3.1.1 and earlier includes a trailing slash to the plugin path
-		return $templatePath . $templateDir . DIRECTORY_SEPARATOR;
 	}	
 
 	/**
@@ -125,16 +129,20 @@ class EditorialBioPlugin extends GenericPlugin {
 	 */
 	public function isEditorWithBio($userid) {
 		$request = $this->getRequest();
-		$userdao = DAORegistry::getDAO('UserDAO');
-		$editor = $userdao->getById($userid);
+		$editor = Repo::user()->get($userid);
+		$editorRoles = [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR];
 		if ($editor) {
 			$context = $request->getContext();
 			$contextId = $context ? $context->getId() : CONTEXT_SITE;
 			// Must be an Editor and must have a Biography to be valid
-			if ($editor->hasRole([ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR], $contextId) && $editor->getLocalizedData('biography')) {
+			if ($editor->hasRole($editorRoles, $contextId) && $editor->getLocalizedData('biography')) {
 				return $editor;
 			}
 		}
 		return false;
 	}
+}
+
+if (!PKP_STRICT_MODE) {
+    class_alias('APP\plugins\generic\editorialBio\EditorialBioPlugin', '\EditorialBioPlugin');
 }
