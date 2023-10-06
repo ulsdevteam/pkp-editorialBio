@@ -28,11 +28,19 @@ class EditorialBioHandler extends Handler {
 		}
 		$plugin = PluginRegistry::getPlugin('generic', 'editorialbioplugin');
 		$editor = $plugin->isEditorWithBio($userId);
+		$orcidProfile = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
+		$orcidIcon = $orcidProfile->getIcon();
+		$profileImage = $editor->getData('profileImage');
+		$profileImageUpload = $profileImage['uploadName'];
 		if ($editor) {
 			// This user is an editor and has a biography
 			$templateMgr = TemplateManager::getManager($request);
-			$templateMgr->assign('editor', $editor);
-			// fetch the template across versions
+			$templateMgr->assign('templateEditor', $editor);
+			$publicfiles = Config::getVar('files', 'public_files_dir') . '/site';
+			$templateMgr->assign('publicfiles', $publicfiles);
+			$templateMgr->assign('profileImage', $profileImage);
+			$templateMgr->assign('profileImageUpload', $profileImageUpload);
+			$templateMgr->assign('orcidIcon', $orcidIcon);
 			$tplName = 'frontend/pages/aboutEditorialTeamBio.tpl';
 			$tpl = $plugin->getTemplateResource($tplName);
 			$templateMgr->display($tpl);
