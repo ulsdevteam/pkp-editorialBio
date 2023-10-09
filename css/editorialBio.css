@@ -1,0 +1,12 @@
+.orcidContent{
+    display:flex;
+}
+
+.orcidIcon{
+    width:24px; 
+    height:24px;
+}
+
+.orcidUrl{
+    font-size:24px;
+}

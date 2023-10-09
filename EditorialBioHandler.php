@@ -29,18 +29,30 @@ class EditorialBioHandler extends Handler {
 		$plugin = PluginRegistry::getPlugin('generic', 'editorialbioplugin');
 		$editor = $plugin->isEditorWithBio($userId);
 		$orcidProfile = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
-		$orcidIcon = $orcidProfile->getIcon();
+		if ($orcidProfile){
+			$orcidIcon = $orcidProfile->getIcon();
+			$cssRequest = $orcidProfile->getRequest();
+		} else {
+			$orcidIcon = null;
+			$cssRequest = null;
+		}
 		$profileImage = $editor->getData('profileImage');
 		$profileImageUpload = $profileImage['uploadName'];
 		if ($editor) {
 			// This user is an editor and has a biography
 			$templateMgr = TemplateManager::getManager($request);
-			$templateMgr->assign('templateEditor', $editor);
+			$templateMgr->assign('editor', $editor);
 			$publicfiles = Config::getVar('files', 'public_files_dir') . '/site';
 			$templateMgr->assign('publicfiles', $publicfiles);
 			$templateMgr->assign('profileImage', $profileImage);
 			$templateMgr->assign('profileImageUpload', $profileImageUpload);
 			$templateMgr->assign('orcidIcon', $orcidIcon);
+			if($orcidProfile) {
+				$templateMgr->addStyleSheet(
+					'editorialBio',
+					$cssRequest->getBaseUrl() . '/' . $plugin->getStyleSheet()
+				);
+			}
 			$tplName = 'frontend/pages/aboutEditorialTeamBio.tpl';
 			$tpl = $plugin->getTemplateResource($tplName);
 			$templateMgr->display($tpl);
