@@ -3,6 +3,10 @@ div.editorialTeamBioContent{
     /*display:flex;*/
 }
 
+div.editorialTeamBioContent .editorialTeamBioContent.biography {
+    padding-bottom: 1em;
+}
+
 div.editorialTeamBioContent .editorialTeamBioContent.orcidIcon {
     width: 1em;
     height: 1em;

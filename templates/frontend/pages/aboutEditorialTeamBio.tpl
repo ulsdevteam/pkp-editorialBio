@@ -25,11 +25,11 @@
 		{$pageTitle|strip_unsafe_html}
 	</h2>
 
-	<div>
+	<div class="editorialTeamBioContent">
 		{if $profileImage}
 			<img src="{$baseUrl}/{$publicfiles}/{$profileImageUpload}?{""|uniqid}" alt="{translate key="user.profile.form.profileImage"}" />
 		{/if}
-		{$editor->getLocalizedData('biography')|strip_unsafe_html}<br>
+		<div class="editorialTeamBioContent biography">{$editor->getLocalizedData('biography')|strip_unsafe_html}</div>
 	</div>
 
 	{if ($editor->getData('orcid') != null) && ($orcidIcon != null)}
