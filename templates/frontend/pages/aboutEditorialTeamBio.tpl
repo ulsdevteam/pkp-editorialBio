@@ -16,7 +16,7 @@
 {assign var="pageTitle" value=$editor->getFullname()}
 {include file="frontend/components/header.tpl" pageTitleTranslated="$pageTitle"}
 
-<div class="page page_about_editorial_team_bio">
+<div class="editorialTeamBioContent">
 	{include file="frontend/components/breadcrumbs.tpl" currentTitle="$pageTitle"}
 	<h1>
 		{translate key="about.editorialTeam"}
@@ -25,7 +25,7 @@
 		{$pageTitle|strip_unsafe_html}
 	</h2>
 
-	<div class="editorialTeamBioContent">
+	<div>
 		{if $profileImage}
 			<img src="{$baseUrl}/{$publicfiles}/{$profileImageUpload}?{""|uniqid}" alt="{translate key="user.profile.form.profileImage"}" />
 		{/if}
@@ -33,9 +33,9 @@
 	</div>
 
 	{if ($editor->getData('orcid') != null) && ($orcidIcon != null)}
-		<div class="orcidContent">
-			<div class="orcidIcon">{$orcidIcon}</div>
-			<a class="orcidUrl" href="{$editor->getData('orcid')}">{$editor->getData('orcid')}</a>
+		<div class="editorialTeamBioContent orcidContent">
+			<div class="editorialTeamBioContent orcidIcon">{$orcidIcon}</div>
+			<a href="{$editor->getData('orcid')}">{$editor->getData('orcid')}</a>
 		</div>
 	{/if}
 </div><!-- .page -->

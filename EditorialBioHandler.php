@@ -29,7 +29,7 @@ class EditorialBioHandler extends Handler {
 		$plugin = PluginRegistry::getPlugin('generic', 'editorialbioplugin');
 		$editor = $plugin->isEditorWithBio($userId);
 		$orcidProfile = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
-		if ($orcidProfile){
+		if ($orcidProfile) {
 			$orcidIcon = $orcidProfile->getIcon();
 			$cssRequest = $orcidProfile->getRequest();
 		} else {
@@ -47,7 +47,7 @@ class EditorialBioHandler extends Handler {
 			$templateMgr->assign('profileImage', $profileImage);
 			$templateMgr->assign('profileImageUpload', $profileImageUpload);
 			$templateMgr->assign('orcidIcon', $orcidIcon);
-			if($orcidProfile) {
+			if ($orcidProfile) {
 				$templateMgr->addStyleSheet(
 					'editorialBio',
 					$cssRequest->getBaseUrl() . '/' . $plugin->getStyleSheet()

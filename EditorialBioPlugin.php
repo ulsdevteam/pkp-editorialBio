@@ -147,8 +147,7 @@ class EditorialBioPlugin extends GenericPlugin {
 	 *
 	 * @return string
 	 */
-	public function getStyleSheet()
-	{
+	public function getStyleSheet() {
 		return $this->getPluginPath() . '/css/editorialBio.css';
 	}
 }

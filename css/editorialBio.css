@@ -1,12 +1,17 @@
-.orcidContent{
+div.editorialTeamBioContent{
+    width:100%;
+    /*display:flex;*/
+}
+
+div.editorialTeamBioContent .editorialTeamBioContent.orcidIcon {
+    width: 1em;
+    height: 1em;
+    min-width: 16px;
+    min-height: 16px;
+    margin-left: .25em;
+    margin-right: .25em;
+}
+
+div.editorialTeamBioContent .editorialTeamBioContent.orcidContent {
     display:flex;
-}
-
-.orcidIcon{
-    width:24px; 
-    height:24px;
-}
-
-.orcidUrl{
-    font-size:24px;
 }
