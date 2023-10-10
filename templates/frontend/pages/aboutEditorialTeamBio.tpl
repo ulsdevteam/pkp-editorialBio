@@ -16,7 +16,7 @@
 {assign var="pageTitle" value=$editor->getFullname()}
 {include file="frontend/components/header.tpl" pageTitleTranslated="$pageTitle"}
 
-<div class="editorialTeamBioContent">
+<div class="page page_about_editorial_team_bio">
 	{include file="frontend/components/breadcrumbs.tpl" currentTitle="$pageTitle"}
 	<h1>
 		{translate key="about.editorialTeam"}
@@ -33,9 +33,11 @@
 	</div>
 
 	{if ($editor->getData('orcid') != null) && ($orcidIcon != null)}
-		<div class="editorialTeamBioContent orcidContent">
-			<div class="editorialTeamBioContent orcidIcon">{$orcidIcon}</div>
-			<a href="{$editor->getData('orcid')}">{$editor->getData('orcid')}</a>
+		<div class="editorialTeamBioContent">
+			<div class="editorialTeamBioContent orcidContent">
+				<div class="editorialTeamBioContent orcidIcon">{$orcidIcon}</div>
+				<a href="{$editor->getData('orcid')}">{$editor->getData('orcid')}</a>
+			</div>
 		</div>
 	{/if}
 </div><!-- .page -->
