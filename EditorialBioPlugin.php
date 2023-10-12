@@ -141,6 +141,15 @@ class EditorialBioPlugin extends GenericPlugin {
 		}
 		return false;
 	}
+
+	/**
+	 * Return the location of the plugin's CSS file
+	 *
+	 * @return string
+	 */
+	public function getStyleSheet() {
+		return $this->getPluginPath() . '/css/editorialBio.css';
+	}
 }
 
 if (!PKP_STRICT_MODE) {

@@ -1,0 +1,9 @@
+div.editorialTeamBioContent .editorialTeamBioContent.orcidIcon {
+    width: 1em;
+    height: 1em;
+    min-width: 16px;
+    min-height: 16px;
+    margin-left: .25em;
+    margin-right: .25em;
+    display: inline-block;
+}
