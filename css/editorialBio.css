@@ -1,12 +1,3 @@
-div.editorialTeamBioContent{
-    width:100%;
-    /*display:flex;*/
-}
-
-div.editorialTeamBioContent .editorialTeamBioContent.biography {
-    padding-bottom: 1em;
-}
-
 div.editorialTeamBioContent .editorialTeamBioContent.orcidIcon {
     width: 1em;
     height: 1em;
@@ -14,8 +5,5 @@ div.editorialTeamBioContent .editorialTeamBioContent.orcidIcon {
     min-height: 16px;
     margin-left: .25em;
     margin-right: .25em;
-}
-
-div.editorialTeamBioContent .editorialTeamBioContent.orcidContent {
-    display:flex;
+    display: inline-block;
 }
