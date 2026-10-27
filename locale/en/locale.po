@@ -19,3 +19,6 @@ msgstr "Enables a public Editorial Biography page for users with this data in th
 
 msgid "grid.action.plugins.generic.editorialBio.bioLink"
 msgstr "Public link to Editorial Team biography"
+
+msgid "plugins.generic.editorialBio.bioLink"
+msgstr "View Biography"
