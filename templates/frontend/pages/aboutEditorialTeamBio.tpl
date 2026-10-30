@@ -19,11 +19,8 @@
 <div class="page page_about_editorial_team_bio">
 	{include file="frontend/components/breadcrumbs.tpl" currentTitle="$pageTitle"}
 	<h1>
-		{translate key="about.editorialTeam"}
-	</h1>
-	<h2>
 		{$pageTitle|strip_unsafe_html}
-	</h2>
+	</h1>
 
 	<div class="editorialTeamBioContent">
 		{if $profileImage}

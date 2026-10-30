@@ -13,6 +13,7 @@
  */
 namespace APP\plugins\generic\editorialBio;
 
+use APP\core\Application;
 use APP\facades\Repo;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
@@ -21,6 +22,8 @@ use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\OpenWindowAction;
 use PKP\security\Role;
 use PKP\core\PKPApplication;
+use PKP\user\User;
+use APP\template\TemplateManager;
 
 class EditorialBioPlugin extends GenericPlugin {
 	/**
@@ -34,6 +37,9 @@ class EditorialBioPlugin extends GenericPlugin {
 			Hook::add('LoadHandler', array($this, 'callbackLoadHandler'));
 			// Add a convenience link to the biography page
 			Hook::add('TemplateManager::fetch', array($this, 'templateFetchCallback'));
+			Hook::add('TemplateManager::display', array($this, 'handleTemplateDisplay'));
+			Hook::add('Schema::get::user', array($this, 'addBioFlagToSchema'));
+			Hook::add('UserSchema::getProperties::values', array($this, 'addBioFlagSetting'));
 			}
 		return $success;
 	}
@@ -60,24 +66,17 @@ class EditorialBioPlugin extends GenericPlugin {
 	 * @param $params array Hook parameters
 	 */
 	public function templateFetchCallback($hookName, $params) {
-		$request = $this->getRequest();
+		$request = Application::get()->getRequest();
 		$router = $request->getRouter();
 		$dispatcher = $router->getDispatcher();
-
 		$resourceName = $params[1];
 		if ($resourceName === 'controllers/grid/gridRow.tpl') {
 			$templateMgr = $params[0];
-			// fetch the gridrow from the template
-			if (method_exists($templateMgr, 'getTemplateVars')) {
-				// Smarty 3
-				$row = $templateMgr->getTemplateVars('row');
-			} else {
-				// Smarty 2
-				$row = $templateMgr->get_template_vars('row');
-			}
+			$row = $templateMgr->getTemplateVars('row');
 			$data = $row ? $row->getData() : array();
+			}
 			// Is this a User grid?
-			if (is_a($data, 'User') || is_a($data, 'PKP\user\User')) {
+			if ($data instanceof User) {
 				// userid from the grid
 				$userid = $data->getId();
 				// Is data present, and is the user eligible?
@@ -93,17 +92,15 @@ class EditorialBioPlugin extends GenericPlugin {
 					));
 				}
 			}
+		return Hook::CONTINUE;
 		}
-	}
 
 	/**
 	 * @see PKPComponentRouter::route()
 	 */
 	public function callbackLoadHandler($hookName, $args) {
 		if ($args[0] === "about" && $args[1] === "editorialTeamBio") {
-			define('HANDLER_CLASS', 'EditorialBioHandler');
-			$args[0] = "plugins.generic.editorialBio.".HANDLER_CLASS;
-			import($args[0]);
+			$args[3] = new EditorialBioHandler($this);
 			return true;
 		}
 		return false;
@@ -128,12 +125,12 @@ class EditorialBioPlugin extends GenericPlugin {
 	 * @return PKPUser|false
 	 */
 	public function isEditorWithBio($userid) {
-		$request = $this->getRequest();
+		$request = Application::get()->getRequest();
 		$editor = Repo::user()->get($userid);
 		$editorRoles = [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR];
 		if ($editor) {
 			$context = $request->getContext();
-			$contextId = $context ? $context->getId() : CONTEXT_SITE;
+			$contextId = $context ? $context->getId() : PKPApplication::CONTEXT_SITE;
 			// Must be an Editor and must have a Biography to be valid
 			if ($editor->hasRole($editorRoles, $contextId) && $editor->getLocalizedData('biography')) {
 				return $editor;
@@ -142,6 +139,43 @@ class EditorialBioPlugin extends GenericPlugin {
 		return false;
 	}
 
+	public function addBioFlagToSchema($hookName, $args) {
+		$schema = $args[0];
+		$schema->properties->{'editorialBio::hasBio'} = (object) [
+			'type' => 'boolean',
+			'apiSummary' => true,
+			'validation' => ['nullable']
+		];
+		return false;
+	}
+
+	public function addBioFlagSetting($hookName, $args) {
+		$output =& $args[1];
+		$user = $args[2];
+		$output['editorialBio::hasBio'] = (bool) $this->isEditorWithBio($user->getId());
+		return false;
+}
+	public function handleTemplateDisplay($hookName, $args) {
+		$request = Application::get()->getRequest();
+		$templateMgr = $args[0];
+		$template = $args[1];
+		if ($template === 'management/access.tpl') {
+			$context = $request->getContext();
+			$contextUrl = $request->getBaseUrl() . ($context ? '/' . $context->getPath() : '');
+			$templateMgr->addJavaScript(
+				'editorialBioConfig',
+				'window.editorialBioBaseUrl = ' . json_encode($contextUrl) . ';',
+				['priority' => TemplateManager::STYLE_SEQUENCE_LAST, 'contexts' => 'backend', 'inline' => true]
+			);
+			$templateMgr->addJavaScript(
+				'editorialBioUserAccessManager',
+				$request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/userAccessManager.js',
+				['priority' => TemplateManager::STYLE_SEQUENCE_LAST, 'contexts' => 'backend']
+			);
+		}
+		return Hook::CONTINUE;
+	}
+	
 	/**
 	 * Return the location of the plugin's CSS file
 	 *
