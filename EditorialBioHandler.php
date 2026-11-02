@@ -9,12 +9,18 @@
  * @ingroup plugins_generic_editorialBio
  * @brief Handles controller requests for EditorialBio plugin.
  */
+
+namespace APP\plugins\generic\editorialBio;
 use APP\handler\Handler;
 use APP\template\TemplateManager;
 use PKP\plugins\PluginRegistry;
+use PKP\config\Config;
 
 class EditorialBioHandler extends Handler {
 
+	public function __construct(protected EditorialBioPlugin $plugin) {
+		parent::__construct();
+	}
 	/**
 	 * Handle editorialTeamBio action
 	 * @param $args array Arguments array.
@@ -26,8 +32,7 @@ class EditorialBioHandler extends Handler {
 		} else {
 			$userId = 0;
 		}
-		$plugin = PluginRegistry::getPlugin('generic', 'editorialbioplugin');
-		$editor = $plugin->isEditorWithBio($userId);
+		$editor = $this->plugin->isEditorWithBio($userId);
 		$orcidProfile = PluginRegistry::getPlugin('generic', 'orcidprofileplugin');
 		if ($orcidProfile) {
 			$orcidIcon = $orcidProfile->getIcon();
@@ -36,10 +41,10 @@ class EditorialBioHandler extends Handler {
 			$orcidIcon = null;
 			$cssRequest = null;
 		}
-		$profileImage = $editor->getData('profileImage');
-		$profileImageUpload = $profileImage['uploadName'];
 		if ($editor) {
 			// This user is an editor and has a biography
+			$profileImage = $editor->getData('profileImage');
+			$profileImageUpload = $profileImage['uploadName'] ?? null;
 			$templateMgr = TemplateManager::getManager($request);
 			$templateMgr->assign('editor', $editor);
 			$publicfiles = Config::getVar('files', 'public_files_dir') . '/site';
@@ -50,11 +55,11 @@ class EditorialBioHandler extends Handler {
 			if ($orcidProfile) {
 				$templateMgr->addStyleSheet(
 					'editorialBio',
-					$cssRequest->getBaseUrl() . '/' . $plugin->getStyleSheet()
+					$cssRequest->getBaseUrl() . '/' . $this->plugin->getStyleSheet()
 				);
 			}
 			$tplName = 'frontend/pages/aboutEditorialTeamBio.tpl';
-			$tpl = $plugin->getTemplateResource($tplName);
+			$tpl = $this->plugin->getTemplateResource($tplName);
 			$templateMgr->display($tpl);
 		} else {
 			// Don't trust other users biographies
