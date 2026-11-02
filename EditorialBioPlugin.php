@@ -161,7 +161,8 @@ class EditorialBioPlugin extends GenericPlugin {
 		$template = $args[1];
 		if ($template === 'management/access.tpl') {
 			$context = $request->getContext();
-			$contextUrl = $request->getBaseUrl() . ($context ? '/' . $context->getPath() : '');
+			$router = $request->getRouter();
+			$contextUrl = $router->url($request, $context ? $context->getPath() : null);
 			$templateMgr->addJavaScript(
 				'editorialBioConfig',
 				'window.editorialBioBaseUrl = ' . json_encode($contextUrl) . ';',
